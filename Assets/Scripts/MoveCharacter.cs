@@ -15,6 +15,11 @@ public class MoveCharacter : MonoBehaviour
 	public Transform NextPoint;
 
 	/// <summary>
+	/// All barrier on map.
+	/// </summary>
+	public LayerMask BarrierLayerMask;
+
+	/// <summary>
 	/// Start is called before the first frame update.
 	/// </summary>
 	void Start()
@@ -43,13 +48,21 @@ public class MoveCharacter : MonoBehaviour
 			var horizontal = Input.GetAxisRaw("Horizontal");
 			if (Mathf.Abs(horizontal) == 1f)
 			{
-				NextPoint.position += new Vector3(horizontal, 0f, 0f);
+				var newVector = new Vector3(horizontal, 0f, 0f);
+				if (!Physics2D.OverlapCircle(NextPoint.position + newVector, 0.2f, BarrierLayerMask))
+				{
+					NextPoint.position += newVector;
+				}
 			}
 
 			var vertical = Input.GetAxisRaw("Vertical");
 			if (Mathf.Abs(vertical) == 1f)
 			{
-				NextPoint.position += new Vector3(0f, vertical, 0f);
+				var newVector = new Vector3(0f, vertical, 0f);
+				if (!Physics2D.OverlapCircle(NextPoint.position + newVector, 0.2f, BarrierLayerMask))
+				{
+					NextPoint.position += newVector;
+				}
 			}
 		}
 	}
