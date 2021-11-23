@@ -7,7 +7,7 @@ public class MoveCharacter : MonoBehaviour
 	/// <summary>
 	/// Character move speed.
 	/// </summary>
-	public float MoveSpeed = 1f;
+	public float MoveSpeed = 5f;
 
 	/// <summary>
 	/// Character next point.
@@ -27,7 +27,16 @@ public class MoveCharacter : MonoBehaviour
 	/// </summary>
 	void Update()
 	{
-		transform.position = Vector3.MoveTowards(transform.position, NextPoint.position, MoveSpeed);
+		MovePlayerCharacter();
+	}
+
+	/// <summary>
+	/// Move player character.
+	/// </summary>
+	private void MovePlayerCharacter()
+	{
+		transform.position = Vector3.MoveTowards(transform.position, NextPoint.position,
+			MoveSpeed * Time.deltaTime);
 
 		if (Vector3.Distance(transform.position, NextPoint.position) <= 0.05f)
 		{
