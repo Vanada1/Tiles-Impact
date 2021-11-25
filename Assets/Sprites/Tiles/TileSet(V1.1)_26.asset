@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: Sprite EX_2
+  m_Name: TileSet(V1.1)_26
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: -217975506, guid: d35d828bb44c24945ac7d09fd04f7843, type: 3}
+  m_Sprite: {fileID: -1199555981, guid: d9b125e773eb19942b4732f2dd866c5b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1

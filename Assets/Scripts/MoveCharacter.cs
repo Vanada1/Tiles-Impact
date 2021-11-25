@@ -2,8 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Class for moving character.
+/// </summary>
 public class MoveCharacter : MonoBehaviour
 {
+	/// <summary>
+	/// Distance in pixels for moving.
+	/// </summary>
+	private const float MovingDistance = 0f;
+
 	/// <summary>
 	/// Character move speed.
 	/// </summary>
@@ -43,7 +51,7 @@ public class MoveCharacter : MonoBehaviour
 		transform.position = Vector3.MoveTowards(transform.position, NextPoint.position,
 			MoveSpeed * Time.deltaTime);
 
-		if (Vector3.Distance(transform.position, NextPoint.position) <= 0.05f)
+		if (Vector3.Distance(transform.position, NextPoint.position) <= MovingDistance)
 		{
 			var horizontal = Input.GetAxisRaw("Horizontal");
 			if (Mathf.Abs(horizontal) == 1f)
@@ -52,6 +60,7 @@ public class MoveCharacter : MonoBehaviour
 				if (!Physics2D.OverlapCircle(NextPoint.position + newVector, 0.2f, BarrierLayerMask))
 				{
 					NextPoint.position += newVector;
+					return;
 				}
 			}
 
