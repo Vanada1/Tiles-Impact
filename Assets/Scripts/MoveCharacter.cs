@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Class for moving character.
@@ -28,6 +30,11 @@ public class MoveCharacter : MonoBehaviour
 	public LayerMask BarrierLayerMask;
 
 	/// <summary>
+	/// Event on turn changed.
+	/// </summary>
+    public event EventHandler TurnChanged;
+
+	/// <summary>
 	/// Start is called before the first frame update.
 	/// </summary>
 	void Start()
@@ -53,26 +60,35 @@ public class MoveCharacter : MonoBehaviour
 
 		if (Vector3.Distance(transform.position, NextPoint.position) <= MovingDistance)
 		{
+            var isTurn = false;
 			var horizontal = Input.GetAxisRaw("Horizontal");
 			if (Mathf.Abs(horizontal) == 1f)
 			{
-				var newVector = new Vector3(horizontal, 0f, 0f);
-				if (!Physics2D.OverlapCircle(NextPoint.position + newVector, 0.2f, BarrierLayerMask))
-				{
-					NextPoint.position += newVector;
-					return;
-				}
-			}
+                isTurn = MoveOnAxis(new Vector3(horizontal, 0f, 0f));
+            }
 
 			var vertical = Input.GetAxisRaw("Vertical");
-			if (Mathf.Abs(vertical) == 1f)
+			if (Mathf.Abs(vertical) == 1f && !isTurn)
 			{
-				var newVector = new Vector3(0f, vertical, 0f);
-				if (!Physics2D.OverlapCircle(NextPoint.position + newVector, 0.2f, BarrierLayerMask))
-				{
-					NextPoint.position += newVector;
-				}
+                MoveOnAxis(new Vector3(0f, vertical, 0f));
 			}
 		}
 	}
+
+	/// <summary>
+	/// Move on one axis.
+	/// </summary>
+	/// <param name="vector">Next trajectory</param>
+	/// <returns>True if moving.</returns>
+    private bool MoveOnAxis(Vector3 vector)
+    {
+        if (Physics2D.OverlapCircle(NextPoint.position + vector, 0.2f, BarrierLayerMask))
+        {
+            return false;
+        }
+
+        NextPoint.position += vector;
+        TurnChanged?.Invoke(this, EventArgs.Empty);
+        return true;
+    }
 }
