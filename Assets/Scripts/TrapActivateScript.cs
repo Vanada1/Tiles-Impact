@@ -14,9 +14,9 @@ public class TrapActivateScript : MonoBehaviour
     private MainScript _mainScript;
 
     /// <summary>
-    /// All trap tiles.
+    /// Trap bounds.
     /// </summary>
-    private List<TileData> _trapTiles;
+	private BoundsInt _trapBounds;
 
     /// <summary>
     /// Number of moves to switch traps.
@@ -34,9 +34,9 @@ public class TrapActivateScript : MonoBehaviour
     public TileBase Stakes;
 
     /// <summary>
-    /// Death tile map.
+    /// Trap whole.
     /// </summary>
-    public Tilemap DeathTileMap;
+    public TileBase TrapWhole;
 
     /// <summary>
     /// Trap tile map.
@@ -49,7 +49,8 @@ public class TrapActivateScript : MonoBehaviour
         _mainScript = gameObject.GetComponent<MainScript>();
         var moveCharacter = Player.gameObject.GetComponent<MoveCharacter>();
         moveCharacter.TurnChanged += OnTurnChanged;
-        _trapTiles = GetAllTrapTiles();
+        _trapBounds = TrapTileMap.cellBounds;
+        SetStakesStartStatus();
     }
 
     // Update is called once per frame
@@ -58,29 +59,6 @@ public class TrapActivateScript : MonoBehaviour
         
     }
 
-    /// <summary>
-    /// Returns all trap tiles.
-    /// </summary>
-    /// <returns>All trap tiles.</returns>
-    private List<TileData> GetAllTrapTiles()
-    {
-	    var bounds = TrapTileMap.cellBounds;
-	    var allTiles = TrapTileMap.GetTilesBlock(bounds);
-	    var allTilesData = new List<TileData>();
-	    for (var x = 0; x < bounds.size.x; x++)
-	    {
-		    for (var y = 0; y < bounds.size.y; y++)
-		    {
-			    var tile = allTiles[x + y * bounds.size.x];
-			    if (tile != null)
-			    {
-				    allTilesData.Add(new TileData(x, y, tile));
-			    }
-		    }
-	    }
-
-        return allTilesData;
-    }
 
     /// <summary>
     /// Event handler TurnChanged.
@@ -100,17 +78,28 @@ public class TrapActivateScript : MonoBehaviour
     /// </summary>
     private void SwitchTraps()
     {
-	    foreach (var trapTile in _trapTiles)
+	    var points = _trapBounds.allPositionsWithin;
+	    do
 	    {
-		    var coordinate = DeathTileMap.WorldToCell(new Vector3(trapTile.X, trapTile.Y));
-		    DeathTileMap.SetTile(coordinate, DeathTileMap.GetTile(coordinate) == null ? Stakes : null);
-		    //DeathTileMap.SetTile(coordinate, IsNeighborDeath(trapTile) ? null : Stakes);
-	    }
+		    var coordinate = points.Current;
+		    var currentTile = TrapTileMap.GetTile(coordinate);
+		    if (currentTile == null)
+		    {
+                continue;
+		    }
+
+		    TrapTileMap.SetTile(coordinate,
+			    currentTile == TrapWhole ? Stakes : TrapWhole);
+	    } while (points.MoveNext());
     }
 
-    private bool IsNeighborDeath(TileData trapTile)
+    /// <summary>
+    /// Get information about neighbor.
+    /// </summary>
+    /// <param name="coordinate">Cell coordinate.</param>
+    /// <returns>True if any neighbor is <see cref="TrapWhole"/>.</returns>
+    private bool IsNeighborDeath(Vector3Int coordinate)
     {
-	    var coordinate = DeathTileMap.WorldToCell(new Vector3(trapTile.X, trapTile.Y));
 	    var neighborCoordinates = new[]
         {
 		    coordinate + new Vector3Int(0, 1),
@@ -118,6 +107,44 @@ public class TrapActivateScript : MonoBehaviour
 		    coordinate + new Vector3Int(1, 0),
 		    coordinate + new Vector3Int(0, -1),
         };
-	    return neighborCoordinates.Any(neighborCoordinate => DeathTileMap.GetTile(neighborCoordinate) == null);
+	    return neighborCoordinates.Any(neighborCoordinate => TrapTileMap.GetTile(neighborCoordinate) == TrapWhole ||
+	                                                         TrapTileMap.GetTile(neighborCoordinate) == null);
+    }
+
+
+    private void SetStakesStartStatus()
+    {
+	    var points = _trapBounds.allPositionsWithin;
+	    do
+	    {
+		    var coordinate = points.Current;
+		    var currentTile = TrapTileMap.GetTile(coordinate);
+		    if (currentTile == null)
+		    {
+                continue;
+		    }
+
+		    var neighborCoordinates = new[]
+		    {
+			    coordinate + new Vector3Int(0, 1),
+			    coordinate + new Vector3Int(-1, 0),
+			    coordinate + new Vector3Int(1, 0),
+			    coordinate + new Vector3Int(0, -1),
+		    };
+
+		    foreach (var neighborCoordinate in neighborCoordinates)
+		    {
+			    var neighborTile = TrapTileMap.GetTile(neighborCoordinate);
+			    if (neighborTile == TrapWhole || neighborTile == null)
+			    {
+				    TrapTileMap.SetTile(coordinate, Stakes);
+			    }
+			    else
+			    {
+				    TrapTileMap.SetTile(coordinate, TrapWhole);
+                    break;
+                }
+		    }
+	    } while (points.MoveNext());
     }
 }
