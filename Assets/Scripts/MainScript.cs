@@ -12,6 +12,11 @@ public class MainScript : MonoBehaviour
     public int CurrentTurn { get; set; } = 0;
 
 	/// <summary>
+	/// Turn changed event.
+	/// </summary>
+	public UnityEvent TurnChanged = new();
+
+	/// <summary>
 	/// Get player object.
 	/// </summary>
 	public GameObject Player;
@@ -37,6 +42,7 @@ public class MainScript : MonoBehaviour
     private void OnTurnChanged()
     {
         CurrentTurn++;
+        TurnChanged?.Invoke();
     }
 
     /// <summary>

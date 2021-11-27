@@ -584,10 +584,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 663459823}
-  - component: {fileID: 663459822}
   - component: {fileID: 663459824}
   - component: {fileID: 663459826}
   - component: {fileID: 663459827}
+  - component: {fileID: 663459822}
   - component: {fileID: 663459828}
   m_Layer: 0
   m_Name: PlayerCharacter
@@ -756,6 +756,7 @@ MonoBehaviour:
   CharacterKilled:
     m_PersistentCalls:
       m_Calls: []
+  StartCoordinate: {x: 0, y: 0, z: 0}
   EventSystem: {fileID: 1935226007}
 --- !u!1 &733134840
 GameObject:
@@ -1467,6 +1468,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba06d25d0dbf1bf4fb7f6d6d4f15861e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TurnChanged:
+    m_PersistentCalls:
+      m_Calls: []
   Player: {fileID: 663459821}
 --- !u!4 &1935226010
 Transform:

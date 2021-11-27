@@ -63,15 +63,15 @@ public class MoveCharacter : MonoBehaviour
 	{
 		transform.position = Vector3.MoveTowards(transform.position, NextPoint.position,
 			MoveSpeed * Time.deltaTime);
-		if (transform.position == NextPoint.position && _isGoing)
-		{
-			_isGoing = false;
-			TurnChanged?.Invoke();
-		}
-
 		if (Vector3.Distance(transform.position, NextPoint.position) <= MovingDistance)
 		{
-            var isTurn = false;
+			if (_isGoing)
+			{
+				_isGoing = false;
+				TurnChanged?.Invoke();
+			}
+
+			var isTurn = false;
 			var horizontal = Input.GetAxisRaw("Horizontal");
 			if (Mathf.Abs(horizontal) == 1f)
 			{

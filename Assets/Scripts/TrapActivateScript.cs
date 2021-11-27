@@ -47,8 +47,7 @@ public class TrapActivateScript : MonoBehaviour
     void Start()
     {
         _mainScript = gameObject.GetComponent<MainScript>();
-        var moveCharacter = Player.gameObject.GetComponent<MoveCharacter>();
-        moveCharacter.TurnChanged.AddListener(OnTurnChanged);
+        _mainScript.TurnChanged.AddListener(OnTurnChanged);
         var deathScript = Player.gameObject.GetComponent<DeathScript>();
         deathScript.CharacterKilled.AddListener(OnCharacterKilled);
         _trapBounds = TrapTileMap.cellBounds;
