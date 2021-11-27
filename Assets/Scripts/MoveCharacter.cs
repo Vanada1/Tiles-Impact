@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 /// <summary>
@@ -13,6 +14,11 @@ public class MoveCharacter : MonoBehaviour
 	/// Distance in pixels for moving.
 	/// </summary>
 	private const float MovingDistance = 0f;
+
+	/// <summary>
+	/// Going flag.
+	/// </summary>
+	private bool _isGoing = false;
 
 	/// <summary>
 	/// Character move speed.
@@ -32,7 +38,7 @@ public class MoveCharacter : MonoBehaviour
 	/// <summary>
 	/// Event on turn changed.
 	/// </summary>
-    public event EventHandler TurnChanged;
+    public UnityEvent TurnChanged = new();
 
 	/// <summary>
 	/// Start is called before the first frame update.
@@ -57,6 +63,11 @@ public class MoveCharacter : MonoBehaviour
 	{
 		transform.position = Vector3.MoveTowards(transform.position, NextPoint.position,
 			MoveSpeed * Time.deltaTime);
+		if (transform.position == NextPoint.position && _isGoing)
+		{
+			_isGoing = false;
+			TurnChanged?.Invoke();
+		}
 
 		if (Vector3.Distance(transform.position, NextPoint.position) <= MovingDistance)
 		{
@@ -87,8 +98,8 @@ public class MoveCharacter : MonoBehaviour
             return false;
         }
 
+        _isGoing = true;
         NextPoint.position += vector;
-        TurnChanged?.Invoke(this, EventArgs.Empty);
         return true;
     }
 }

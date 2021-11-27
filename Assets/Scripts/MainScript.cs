@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class MainScript : MonoBehaviour
 {
@@ -19,7 +20,9 @@ public class MainScript : MonoBehaviour
     void Start()
     {
         var moveCharacter = Player.gameObject.GetComponent<MoveCharacter>();
-        moveCharacter.TurnChanged += OnTurnChanged;
+        moveCharacter.TurnChanged.AddListener(OnTurnChanged);
+        var deathScript = Player.gameObject.GetComponent<DeathScript>();
+        deathScript.CharacterKilled.AddListener(OnCharacterKilled);
     }
 
     // Update is called once per frame
@@ -31,10 +34,16 @@ public class MainScript : MonoBehaviour
     /// <summary>
     /// Event handler TurnChanged.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void OnTurnChanged(object sender, EventArgs e)
+    private void OnTurnChanged()
     {
         CurrentTurn++;
+    }
+
+    /// <summary>
+    /// Event handler CharacterKilled
+    /// </summary>
+    private void OnCharacterKilled()
+    {
+	    CurrentTurn = 0;
     }
 }

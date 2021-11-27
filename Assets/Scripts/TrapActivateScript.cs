@@ -48,7 +48,9 @@ public class TrapActivateScript : MonoBehaviour
     {
         _mainScript = gameObject.GetComponent<MainScript>();
         var moveCharacter = Player.gameObject.GetComponent<MoveCharacter>();
-        moveCharacter.TurnChanged += OnTurnChanged;
+        moveCharacter.TurnChanged.AddListener(OnTurnChanged);
+        var deathScript = Player.gameObject.GetComponent<DeathScript>();
+        deathScript.CharacterKilled.AddListener(OnCharacterKilled);
         _trapBounds = TrapTileMap.cellBounds;
         SetStakesStartStatus();
     }
@@ -59,22 +61,50 @@ public class TrapActivateScript : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Is character in death zone.
+    /// </summary>
+    /// <returns>True if character is in death zone.</returns>
+    public bool IsInDeathZone(Vector3 characterPosition)
+    {
+	    var cellCoordinate = TrapTileMap.WorldToCell(characterPosition);
+	    return TrapTileMap.GetTile(cellCoordinate) == Stakes;
+    }
 
     /// <summary>
     /// Event handler TurnChanged.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void OnTurnChanged(object sender, EventArgs e)
+    private void OnTurnChanged()
     {
-        if (_mainScript.CurrentTurn % SwitchTurnCount == 0)
+        if (_mainScript.CurrentTurn % SwitchTurnCount == 0 &&
+            _mainScript.CurrentTurn != 0)
         {
 	        SwitchTraps();
         }
     }
 
     /// <summary>
-    /// Switch trap on <see cref="DeathTileMap"/>.
+    /// Event handler CharacterKilled
+    /// </summary>
+    private void OnCharacterKilled()
+    {
+	    var points = _trapBounds.allPositionsWithin;
+	    do
+	    {
+		    var coordinate = points.Current;
+		    var currentTile = TrapTileMap.GetTile(coordinate);
+		    if (currentTile == null)
+		    {
+			    continue;
+		    }
+
+		    TrapTileMap.SetTile(coordinate, TrapWhole);
+	    } while (points.MoveNext());
+        SetStakesStartStatus();
+    }
+
+    /// <summary>
+    /// Switch trap on <see cref="TrapTileMap"/>.
     /// </summary>
     private void SwitchTraps()
     {
@@ -94,24 +124,8 @@ public class TrapActivateScript : MonoBehaviour
     }
 
     /// <summary>
-    /// Get information about neighbor.
+    /// Set start position for traps.
     /// </summary>
-    /// <param name="coordinate">Cell coordinate.</param>
-    /// <returns>True if any neighbor is <see cref="TrapWhole"/>.</returns>
-    private bool IsNeighborDeath(Vector3Int coordinate)
-    {
-	    var neighborCoordinates = new[]
-        {
-		    coordinate + new Vector3Int(0, 1),
-		    coordinate + new Vector3Int(-1, 0),
-		    coordinate + new Vector3Int(1, 0),
-		    coordinate + new Vector3Int(0, -1),
-        };
-	    return neighborCoordinates.Any(neighborCoordinate => TrapTileMap.GetTile(neighborCoordinate) == TrapWhole ||
-	                                                         TrapTileMap.GetTile(neighborCoordinate) == null);
-    }
-
-
     private void SetStakesStartStatus()
     {
 	    var points = _trapBounds.allPositionsWithin;
