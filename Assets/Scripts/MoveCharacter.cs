@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Class for moving character.
@@ -11,6 +14,11 @@ public class MoveCharacter : MonoBehaviour
 	/// Distance in pixels for moving.
 	/// </summary>
 	private const float MovingDistance = 0f;
+
+	/// <summary>
+	/// Going flag.
+	/// </summary>
+	private bool _isGoing = false;
 
 	/// <summary>
 	/// Character move speed.
@@ -26,6 +34,11 @@ public class MoveCharacter : MonoBehaviour
 	/// All barrier on map.
 	/// </summary>
 	public LayerMask BarrierLayerMask;
+
+	/// <summary>
+	/// Event on turn changed.
+	/// </summary>
+    public UnityEvent TurnChanged = new();
 
 	/// <summary>
 	/// Start is called before the first frame update.
@@ -50,29 +63,43 @@ public class MoveCharacter : MonoBehaviour
 	{
 		transform.position = Vector3.MoveTowards(transform.position, NextPoint.position,
 			MoveSpeed * Time.deltaTime);
-
 		if (Vector3.Distance(transform.position, NextPoint.position) <= MovingDistance)
 		{
+			if (_isGoing)
+			{
+				_isGoing = false;
+				TurnChanged?.Invoke();
+			}
+
+			var isTurn = false;
 			var horizontal = Input.GetAxisRaw("Horizontal");
 			if (Mathf.Abs(horizontal) == 1f)
 			{
-				var newVector = new Vector3(horizontal, 0f, 0f);
-				if (!Physics2D.OverlapCircle(NextPoint.position + newVector, 0.2f, BarrierLayerMask))
-				{
-					NextPoint.position += newVector;
-					return;
-				}
-			}
+                isTurn = MoveOnAxis(new Vector3(horizontal, 0f, 0f));
+            }
 
 			var vertical = Input.GetAxisRaw("Vertical");
-			if (Mathf.Abs(vertical) == 1f)
+			if (Mathf.Abs(vertical) == 1f && !isTurn)
 			{
-				var newVector = new Vector3(0f, vertical, 0f);
-				if (!Physics2D.OverlapCircle(NextPoint.position + newVector, 0.2f, BarrierLayerMask))
-				{
-					NextPoint.position += newVector;
-				}
+                MoveOnAxis(new Vector3(0f, vertical, 0f));
 			}
 		}
 	}
+
+	/// <summary>
+	/// Move on one axis.
+	/// </summary>
+	/// <param name="vector">Next trajectory</param>
+	/// <returns>True if moving.</returns>
+    private bool MoveOnAxis(Vector3 vector)
+    {
+        if (Physics2D.OverlapCircle(NextPoint.position + vector, 0.2f, BarrierLayerMask))
+        {
+            return false;
+        }
+
+        _isGoing = true;
+        NextPoint.position += vector;
+        return true;
+    }
 }
