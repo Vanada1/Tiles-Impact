@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using UnityEngine.Tilemaps;
 using static UnityEngine.Application;
 
 public class MainScript : MonoBehaviour
@@ -23,6 +24,21 @@ public class MainScript : MonoBehaviour
 	/// </summary>
 	public GameObject Player;
 
+	/// <summary>
+	/// Flag tile.
+	/// </summary>
+	public TileBase FlagTile;
+
+	/// <summary>
+	/// Finish tile.
+	/// </summary>
+	public TileBase FinishTile;
+
+	/// <summary>
+	/// Start finish tile map.
+	/// </summary>
+	public Tilemap StartFinishTileMap;
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -30,12 +46,14 @@ public class MainScript : MonoBehaviour
 		moveCharacter.TurnChanged.AddListener(OnTurnChanged);
 		var deathScript = Player.gameObject.GetComponent<DeathScript>();
 		deathScript.CharacterKilled.AddListener(OnCharacterKilled);
+		CurrentTurn = 0;
+		FindStart();
 	}
-
+	
 	// Update is called once per frame
 	void Update()
 	{
-		
+		CheckFinish();
 	}
 
 	/// <summary>
@@ -52,7 +70,41 @@ public class MainScript : MonoBehaviour
 	/// </summary>
 	private void OnCharacterKilled()
 	{
-		CurrentTurn = 0;
 		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+	}
+
+	/// <summary>
+	/// Find start flag.
+	/// </summary>
+	private void FindStart()
+	{
+		var position = new Vector3(0, 0);
+		var points = StartFinishTileMap.cellBounds.allPositionsWithin;
+		do
+		{
+			var coordinate = points.Current;
+			var currentTile = StartFinishTileMap.GetTile(coordinate);
+			if (currentTile == FlagTile)
+			{
+				position = StartFinishTileMap.GetCellCenterWorld(coordinate);
+				break;
+			}
+		} while (points.MoveNext());
+
+		var moveScript = Player.GetComponent<MoveCharacter>();
+		moveScript.Position = position;
+	}
+
+	/// <summary>
+	/// Checks player on finish tail.
+	/// </summary>
+	private void CheckFinish()
+	{
+		var moveScript = Player.GetComponent<MoveCharacter>();
+		var point = StartFinishTileMap.WorldToCell(moveScript.Position);
+		if (StartFinishTileMap.GetTile(point) == FinishTile)
+		{
+			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+		}
 	}
 }

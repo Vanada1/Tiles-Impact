@@ -58,6 +58,19 @@ public class MoveCharacter : MonoBehaviour
 	public List<TileBase> IgnoredTiles;
 
 	/// <summary>
+	/// Returns and sets player position.
+	/// </summary>
+	public Vector3 Position
+	{
+		get => transform.position;
+		set
+		{
+			transform.position = value;
+			NextPoint.position = value;
+		}
+	}
+
+	/// <summary>
 	/// Start is called before the first frame update.
 	/// </summary>
 	void Start()

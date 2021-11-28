@@ -12,11 +12,6 @@ public class DeathScript : MonoBehaviour
 	public UnityEvent CharacterKilled = new();
 
 	/// <summary>
-	/// Start coordinate character.
-	/// </summary>
-	public Vector3 StartCoordinate;
-
-	/// <summary>
 	/// Event system
 	/// </summary>
 	public GameObject EventSystem;
@@ -42,9 +37,6 @@ public class DeathScript : MonoBehaviour
 	/// </summary>
 	private void KillCharacter()
 	{
-		var moveCharacter = gameObject.GetComponent<MoveCharacter>();
-		moveCharacter.NextPoint.position = new Vector3(0, 0);
-		transform.position = StartCoordinate;
 		CharacterKilled.Invoke();
 	}
 
