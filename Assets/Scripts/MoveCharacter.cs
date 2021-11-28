@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.Tilemaps;
 
 /// <summary>
 /// Class for moving character.
@@ -19,6 +21,11 @@ public class MoveCharacter : MonoBehaviour
 	/// Going flag.
 	/// </summary>
 	private bool _isGoing = false;
+
+	/// <summary>
+	/// All Tilemaps from <see cref="Grid"/>
+	/// </summary>
+	private List<Tilemap> _tilemaps;
 
 	/// <summary>
 	/// Character move speed.
@@ -41,11 +48,22 @@ public class MoveCharacter : MonoBehaviour
 	public UnityEvent TurnChanged = new();
 
 	/// <summary>
+	/// Grid Tilemaps.
+	/// </summary>
+	public Grid Grid;
+
+	/// <summary>
+	/// Ignored Tiles.
+	/// </summary>
+	public List<TileBase> IgnoredTiles;
+
+	/// <summary>
 	/// Start is called before the first frame update.
 	/// </summary>
 	void Start()
 	{
 		NextPoint.parent = null;
+		_tilemaps = Grid.GetComponentsInChildren<Tilemap>().ToList();
 	}
 
 	/// <summary>
@@ -96,7 +114,7 @@ public class MoveCharacter : MonoBehaviour
 	/// <returns>True if moving.</returns>
 	private bool MoveOnAxis(Vector3 vector)
 	{
-		if (Physics2D.OverlapCircle(NextPoint.position + vector, 0.2f, BarrierLayerMask))
+		if (!CanMoving(vector))
 		{
 			return false;
 		}
@@ -104,5 +122,23 @@ public class MoveCharacter : MonoBehaviour
 		_isGoing = true;
 		NextPoint.position += vector;
 		return true;
+	}
+
+	private bool CanMoving(Vector3 vector)
+	{
+		var nextPosition = NextPoint.position + vector;
+		var isVoid =
+			(from tilemap in _tilemaps
+				let tileMapCoordinate = tilemap.WorldToCell(nextPosition)
+				select tilemap.GetTile(tileMapCoordinate))
+			.All(currentTile => currentTile == null ||
+			                    IgnoredTiles.Contains(currentTile));
+
+		if (isVoid)
+		{
+			return false;
+		}
+
+		return !Physics2D.OverlapCircle(nextPosition, 0.2f, BarrierLayerMask);
 	}
 }
