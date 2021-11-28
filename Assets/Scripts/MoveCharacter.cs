@@ -38,7 +38,7 @@ public class MoveCharacter : MonoBehaviour
 	/// <summary>
 	/// Event on turn changed.
 	/// </summary>
-    public UnityEvent TurnChanged = new();
+	public UnityEvent TurnChanged = new();
 
 	/// <summary>
 	/// Start is called before the first frame update.
@@ -63,26 +63,29 @@ public class MoveCharacter : MonoBehaviour
 	{
 		transform.position = Vector3.MoveTowards(transform.position, NextPoint.position,
 			MoveSpeed * Time.deltaTime);
-		if (Vector3.Distance(transform.position, NextPoint.position) <= MovingDistance)
+		if (Vector3.Distance(transform.position, NextPoint.position) > MovingDistance)
 		{
-			if (_isGoing)
-			{
-				_isGoing = false;
-				TurnChanged?.Invoke();
-			}
+			return;
+		}
 
-			var isTurn = false;
-			var horizontal = Input.GetAxisRaw("Horizontal");
-			if (Mathf.Abs(horizontal) == 1f)
-			{
-                isTurn = MoveOnAxis(new Vector3(horizontal, 0f, 0f));
-            }
+		if (_isGoing)
+		{
+			_isGoing = false;
+			TurnChanged?.Invoke();
+			return;
+		}
 
-			var vertical = Input.GetAxisRaw("Vertical");
-			if (Mathf.Abs(vertical) == 1f && !isTurn)
-			{
-                MoveOnAxis(new Vector3(0f, vertical, 0f));
-			}
+		var isTurn = false;
+		var horizontal = Input.GetAxisRaw("Horizontal");
+		if (Mathf.Abs(horizontal) == 1f)
+		{
+			isTurn = MoveOnAxis(new Vector3(horizontal, 0f, 0f));
+		}
+
+		var vertical = Input.GetAxisRaw("Vertical");
+		if (Mathf.Abs(vertical) == 1f && !isTurn)
+		{
+			MoveOnAxis(new Vector3(0f, vertical, 0f));
 		}
 	}
 
@@ -91,15 +94,15 @@ public class MoveCharacter : MonoBehaviour
 	/// </summary>
 	/// <param name="vector">Next trajectory</param>
 	/// <returns>True if moving.</returns>
-    private bool MoveOnAxis(Vector3 vector)
-    {
-        if (Physics2D.OverlapCircle(NextPoint.position + vector, 0.2f, BarrierLayerMask))
-        {
-            return false;
-        }
+	private bool MoveOnAxis(Vector3 vector)
+	{
+		if (Physics2D.OverlapCircle(NextPoint.position + vector, 0.2f, BarrierLayerMask))
+		{
+			return false;
+		}
 
-        _isGoing = true;
-        NextPoint.position += vector;
-        return true;
-    }
+		_isGoing = true;
+		NextPoint.position += vector;
+		return true;
+	}
 }
