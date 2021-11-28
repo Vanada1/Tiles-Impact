@@ -28,6 +28,11 @@ public class MoveCharacter : MonoBehaviour
 	private List<Tilemap> _tilemaps;
 
 	/// <summary>
+	/// Movement vector.
+	/// </summary>
+	private Vector2 _movement;
+
+	/// <summary>
 	/// Character move speed.
 	/// </summary>
 	public float MoveSpeed = 5f;
@@ -56,6 +61,16 @@ public class MoveCharacter : MonoBehaviour
 	/// Ignored Tiles.
 	/// </summary>
 	public List<TileBase> IgnoredTiles;
+
+	/// <summary>
+	/// Animator.
+	/// </summary>
+	public Animator Animator;
+
+	/// <summary>
+	/// Sprite render.
+	/// </summary>
+	public SpriteRenderer SpriteRenderer;
 
 	/// <summary>
 	/// Returns and sets player position.
@@ -87,13 +102,29 @@ public class MoveCharacter : MonoBehaviour
 		MovePlayerCharacter();
 	}
 
+	void FixedUpdate()
+	{
+		transform.position = Vector3.MoveTowards(transform.position, NextPoint.position,
+			MoveSpeed * Time.deltaTime);
+	}
+
 	/// <summary>
 	/// Move player character.
 	/// </summary>
 	private void MovePlayerCharacter()
 	{
-		transform.position = Vector3.MoveTowards(transform.position, NextPoint.position,
-			MoveSpeed * Time.deltaTime);
+		var horizontal = Input.GetAxisRaw("Horizontal");
+		var vertical = Input.GetAxisRaw("Vertical");
+		if (!_isGoing)
+		{
+			_movement = new Vector2(horizontal, vertical);
+		}
+
+		SpriteRenderer.flipX = horizontal < 0;
+		Animator.SetFloat("Horizontal", horizontal);
+		Animator.SetFloat("Vertical", vertical);
+		Animator.SetFloat("Speed", _movement.sqrMagnitude);
+
 		if (Vector3.Distance(transform.position, NextPoint.position) > MovingDistance)
 		{
 			return;
@@ -107,13 +138,11 @@ public class MoveCharacter : MonoBehaviour
 		}
 
 		var isTurn = false;
-		var horizontal = Input.GetAxisRaw("Horizontal");
 		if (Mathf.Abs(horizontal) == 1f)
 		{
 			isTurn = MoveOnAxis(new Vector3(horizontal, 0f, 0f));
 		}
 
-		var vertical = Input.GetAxisRaw("Vertical");
 		if (Mathf.Abs(vertical) == 1f && !isTurn)
 		{
 			MoveOnAxis(new Vector3(0f, vertical, 0f));
