@@ -2242,6 +2242,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a1ddaf52f61caea49abccd8a57f02845, type: 2}
   - {fileID: 11400000, guid: 2c3b3bb0f46e58a4c8908e9bb8275485, type: 2}
   - {fileID: 11400000, guid: 99828fbc5ce2e654782b4ab16c866b79, type: 2}
+  Animator: {fileID: 214301584}
+  SpriteRenderer: {fileID: 214301585}
 --- !u!4 &1912052769
 Transform:
   m_ObjectHideFlags: 0
