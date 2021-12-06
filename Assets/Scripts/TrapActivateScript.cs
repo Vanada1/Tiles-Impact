@@ -9,6 +9,16 @@ using TileData = Assets.Scripts.Core.TileData;
 public class TrapActivateScript : MonoBehaviour
 {
 	/// <summary>
+	/// Is active trap flag.
+	/// </summary>
+	private bool _isActive;
+
+	/// <summary>
+	/// Trap tile map.
+	/// </summary>
+	private Tilemap _trapTileMap;
+
+	/// <summary>
 	/// Main script object.
 	/// </summary>
 	private MainScript _mainScript;
@@ -39,17 +49,31 @@ public class TrapActivateScript : MonoBehaviour
 	public TileBase TrapWhole;
 
 	/// <summary>
-	/// Trap tile map.
+	/// Main object.
 	/// </summary>
-	public Tilemap TrapTileMap;
+	public GameObject MainObject;
+
+	/// <summary>
+	/// Returns and Sets is active trap flag.
+	/// </summary>
+	public bool IsActive
+	{
+		get => _isActive;
+		set
+		{
+			_isActive = value;
+			ChangeAllTrap();
+		}
+	}
 
 	// Start is called before the first frame update
 	void Start()
 	{
-		_mainScript = gameObject.GetComponent<MainScript>();
+		_trapTileMap = gameObject.GetComponent<Tilemap>();
+		_mainScript = MainObject.GetComponent<MainScript>();
 		_mainScript.TurnChanged.AddListener(OnTurnChanged);
-		_trapBounds = TrapTileMap.cellBounds;
-		SetStakesStartStatus();
+		_trapBounds = _trapTileMap.cellBounds;
+		IsActive = true;
 	}
 
 	// Update is called once per frame
@@ -64,8 +88,8 @@ public class TrapActivateScript : MonoBehaviour
 	/// <returns>True if character is in death zone.</returns>
 	public bool IsInDeathZone(Vector3 characterPosition)
 	{
-		var cellCoordinate = TrapTileMap.WorldToCell(characterPosition);
-		return TrapTileMap.GetTile(cellCoordinate) == Stakes;
+		var cellCoordinate = _trapTileMap.WorldToCell(characterPosition);
+		return _trapTileMap.GetTile(cellCoordinate) == Stakes;
 	}
 
 	/// <summary>
@@ -73,7 +97,7 @@ public class TrapActivateScript : MonoBehaviour
 	/// </summary>
 	private void OnTurnChanged()
 	{
-		if (_mainScript.CurrentTurn % SwitchTurnCount == 0 &&
+		if (IsActive && _mainScript.CurrentTurn % SwitchTurnCount == 0 &&
 			_mainScript.CurrentTurn != 0)
 		{
 			SwitchTraps();
@@ -81,7 +105,7 @@ public class TrapActivateScript : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Switch trap on <see cref="TrapTileMap"/>.
+	/// Switch trap on <see cref="_trapTileMap"/>.
 	/// </summary>
 	private void SwitchTraps()
 	{
@@ -89,13 +113,13 @@ public class TrapActivateScript : MonoBehaviour
 		do
 		{
 			var coordinate = points.Current;
-			var currentTile = TrapTileMap.GetTile(coordinate);
+			var currentTile = _trapTileMap.GetTile(coordinate);
 			if (currentTile == null)
 			{
 				continue;
 			}
 
-			TrapTileMap.SetTile(coordinate,
+			_trapTileMap.SetTile(coordinate,
 				currentTile == TrapWhole ? Stakes : TrapWhole);
 		} while (points.MoveNext());
 	}
@@ -109,7 +133,7 @@ public class TrapActivateScript : MonoBehaviour
 		do
 		{
 			var coordinate = points.Current;
-			var currentTile = TrapTileMap.GetTile(coordinate);
+			var currentTile = _trapTileMap.GetTile(coordinate);
 			if (currentTile == null)
 			{
 				continue;
@@ -125,17 +149,53 @@ public class TrapActivateScript : MonoBehaviour
 
 			foreach (var neighborCoordinate in neighborCoordinates)
 			{
-				var neighborTile = TrapTileMap.GetTile(neighborCoordinate);
+				var neighborTile = _trapTileMap.GetTile(neighborCoordinate);
 				if (neighborTile == TrapWhole || neighborTile == null)
 				{
-					TrapTileMap.SetTile(coordinate, Stakes);
+					_trapTileMap.SetTile(coordinate, Stakes);
 				}
 				else
 				{
-					TrapTileMap.SetTile(coordinate, TrapWhole);
+					_trapTileMap.SetTile(coordinate, TrapWhole);
 					break;
 				}
 			}
+		} while (points.MoveNext());
+	}
+
+
+	/// <summary>
+	/// Off or on all traps
+	/// </summary>
+	private void ChangeAllTrap()
+	{
+		if (IsActive)
+		{
+			SetStakesStartStatus();
+		}
+		else
+		{
+			TurnOffTraps();
+		}
+	}
+
+	/// <summary>
+	/// Turn off all traps.
+	/// </summary>
+	private void TurnOffTraps()
+	{
+		var points = _trapBounds.allPositionsWithin;
+		do
+		{
+			var coordinate = points.Current;
+			var currentTile = _trapTileMap.GetTile(coordinate);
+			if (currentTile == null)
+			{
+				continue;
+			}
+
+			_trapTileMap.SetTile(coordinate, TrapWhole);
+
 		} while (points.MoveNext());
 	}
 }

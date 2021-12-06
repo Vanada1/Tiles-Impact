@@ -14,7 +14,7 @@ public class DeathScript : MonoBehaviour
 	/// <summary>
 	/// Event system
 	/// </summary>
-	public GameObject EventSystem;
+	public GameObject MainGameObject;
 
 	// Start is called before the first frame update
 	void Start()
@@ -25,10 +25,15 @@ public class DeathScript : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		var trapActivateScript = EventSystem.GetComponent<TrapActivateScript>();
-		if (trapActivateScript.IsInDeathZone(transform.position))
+		var gameObjects = GameObject.FindGameObjectsWithTag("Trap");
+		foreach (var o in gameObjects)
 		{
-			KillCharacter();
+			var trapActivate = o.GetComponent<TrapActivateScript>();
+			if (trapActivate != null && 
+			    trapActivate.IsInDeathZone(transform.position))
+			{
+				KillCharacter();
+			}
 		}
 	}
 

@@ -29,8 +29,11 @@ public class FallTileScript : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
-		var mainScript = gameObject.GetComponent<MainScript>();
-		mainScript.TurnChanged.AddListener(OnTurnChanged);
+		var mainScript = GetComponentInParent<MainScript>();
+		if (mainScript != null)
+		{
+			mainScript.TurnChanged.AddListener(OnTurnChanged);
+		}
 	}
 
 	// Update is called once per frame
