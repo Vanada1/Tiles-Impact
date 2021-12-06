@@ -73,15 +73,15 @@ public class ButtonLogicScript : MonoBehaviour
 		    return;
 	    }
 
-	    var trapActivateScript = TrapTileMap.GetComponent<TrapActivateScript>();
+	    var activateScript = TrapTileMap.GetComponent<OffOnScriptBase>();
 	    if (_turnLeft > 0 &&
-	        !trapActivateScript.IsActive)
+	        !activateScript.IsActive)
 	    {
 		    _turnLeft--;
 	    }
-	    else if (!trapActivateScript.IsActive)
+	    else if (!activateScript.IsActive)
 	    {
-		    trapActivateScript.IsActive = true;
+		    activateScript.IsActive = true;
 		    _thisTilemap.SetTile(_buttonCoordinate, UnpressedButton);
 	    }
     }
@@ -100,7 +100,7 @@ public class ButtonLogicScript : MonoBehaviour
 
 	    _buttonCoordinate = playerCoordinate;
 	    _thisTilemap.SetTile(_buttonCoordinate, PressedButton);
-	    var trapActivateScript = TrapTileMap.GetComponent<TrapActivateScript>();
+	    var trapActivateScript = TrapTileMap.GetComponent<OffOnScriptBase>();
 	    if (trapActivateScript != null && trapActivateScript.IsActive)
 	    {
 		    trapActivateScript.IsActive = false;

@@ -6,13 +6,8 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using TileData = Assets.Scripts.Core.TileData;
 
-public class TrapActivateScript : MonoBehaviour
+public class TrapActivateScript : OffOnScriptBase
 {
-	/// <summary>
-	/// Is active trap flag.
-	/// </summary>
-	private bool _isActive;
-
 	/// <summary>
 	/// Trap tile map.
 	/// </summary>
@@ -39,32 +34,9 @@ public class TrapActivateScript : MonoBehaviour
 	public GameObject Player;
 
 	/// <summary>
-	/// Stakes for death.
-	/// </summary>
-	public TileBase Stakes;
-
-	/// <summary>
-	/// Trap whole.
-	/// </summary>
-	public TileBase TrapWhole;
-
-	/// <summary>
 	/// Main object.
 	/// </summary>
 	public GameObject MainObject;
-
-	/// <summary>
-	/// Returns and Sets is active trap flag.
-	/// </summary>
-	public bool IsActive
-	{
-		get => _isActive;
-		set
-		{
-			_isActive = value;
-			ChangeAllTrap();
-		}
-	}
 
 	// Start is called before the first frame update
 	void Start()
@@ -89,7 +61,7 @@ public class TrapActivateScript : MonoBehaviour
 	public bool IsInDeathZone(Vector3 characterPosition)
 	{
 		var cellCoordinate = _trapTileMap.WorldToCell(characterPosition);
-		return _trapTileMap.GetTile(cellCoordinate) == Stakes;
+		return _trapTileMap.GetTile(cellCoordinate) == OnTile;
 	}
 
 	/// <summary>
@@ -120,7 +92,7 @@ public class TrapActivateScript : MonoBehaviour
 			}
 
 			_trapTileMap.SetTile(coordinate,
-				currentTile == TrapWhole ? Stakes : TrapWhole);
+				currentTile == OffTile ? OnTile : OffTile);
 		} while (points.MoveNext());
 	}
 
@@ -150,13 +122,13 @@ public class TrapActivateScript : MonoBehaviour
 			foreach (var neighborCoordinate in neighborCoordinates)
 			{
 				var neighborTile = _trapTileMap.GetTile(neighborCoordinate);
-				if (neighborTile == TrapWhole || neighborTile == null)
+				if (neighborTile == OffTile || neighborTile == null)
 				{
-					_trapTileMap.SetTile(coordinate, Stakes);
+					_trapTileMap.SetTile(coordinate, OnTile);
 				}
 				else
 				{
-					_trapTileMap.SetTile(coordinate, TrapWhole);
+					_trapTileMap.SetTile(coordinate, OffTile);
 					break;
 				}
 			}
@@ -167,7 +139,7 @@ public class TrapActivateScript : MonoBehaviour
 	/// <summary>
 	/// Off or on all traps
 	/// </summary>
-	private void ChangeAllTrap()
+	protected override void ChangeAllTrap()
 	{
 		if (IsActive)
 		{
@@ -194,7 +166,7 @@ public class TrapActivateScript : MonoBehaviour
 				continue;
 			}
 
-			_trapTileMap.SetTile(coordinate, TrapWhole);
+			_trapTileMap.SetTile(coordinate, OffTile);
 
 		} while (points.MoveNext());
 	}

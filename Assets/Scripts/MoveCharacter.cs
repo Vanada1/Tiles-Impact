@@ -169,14 +169,24 @@ public class MoveCharacter : MonoBehaviour
 	private bool CanMoving(Vector3 vector)
 	{
 		var nextPosition = NextPoint.position + vector;
-		var isVoid =
-			(from tilemap in _tilemaps
-				let tileMapCoordinate = tilemap.WorldToCell(nextPosition)
-				select tilemap.GetTile(tileMapCoordinate))
-			.All(currentTile => currentTile == null ||
-			                    IgnoredTiles.Contains(currentTile));
+		var isNotValidTail = _tilemaps.All(tilemap => tilemap.GetTile(tilemap.WorldToCell(nextPosition)) == null);
+		if (isNotValidTail)
+		{
+			return false;
+		}
 
-		if (isVoid)
+		foreach (var tilemap in _tilemaps)
+		{
+			Vector3Int tileMapCoordinate = tilemap.WorldToCell(nextPosition);
+			var currentTile = tilemap.GetTile(tileMapCoordinate);
+			if (currentTile != null && IgnoredTiles.Contains(currentTile))
+			{
+				isNotValidTail = true;
+				break;
+			}
+		}
+
+		if (isNotValidTail)
 		{
 			return false;
 		}
