@@ -10,6 +10,11 @@ using static UnityEngine.Application;
 public class MainScript : MonoBehaviour
 {
 	/// <summary>
+	/// Loader scenes.
+	/// </summary>
+	private List<AsyncOperation> _scenesToLoad = new List<AsyncOperation>();
+
+	/// <summary>
 	/// Returns and sets current turn.
 	/// </summary>
 	public int CurrentTurn { get; set; } = 0;
@@ -47,6 +52,7 @@ public class MainScript : MonoBehaviour
 		var deathScript = Player.gameObject.GetComponent<DeathScript>();
 		deathScript.CharacterKilled.AddListener(OnCharacterKilled);
 		CurrentTurn = 0;
+		LoadScenes();
 		FindStart();
 	}
 	
@@ -54,6 +60,14 @@ public class MainScript : MonoBehaviour
 	void Update()
 	{
 		CheckFinish();
+	}
+
+	/// <summary>
+	/// Loads all scenes from path.
+	/// </summary>
+	private void LoadScenes()
+	{
+		//_scenesToLoad.Add(SceneManager.LoadSceneAsync("Scene1", LoadSceneMode.Additive));
 	}
 
 	/// <summary>
@@ -104,7 +118,8 @@ public class MainScript : MonoBehaviour
 		var point = StartFinishTileMap.WorldToCell(moveScript.Position);
 		if (StartFinishTileMap.GetTile(point) == FinishTile)
 		{
-			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+			SceneManager.LoadScene("Scene1", LoadSceneMode.Additive);
+			
 		}
 	}
 }
