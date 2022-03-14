@@ -118,7 +118,9 @@ public class MainScript : MonoBehaviour
 		var point = StartFinishTileMap.WorldToCell(moveScript.Position);
 		if (StartFinishTileMap.GetTile(point) == FinishTile)
 		{
-			SceneManager.LoadScene("Scene1", LoadSceneMode.Additive);
+			var nextScene = (SceneManager.GetActiveScene().buildIndex + 1)
+			                % SceneManager.sceneCountInBuildSettings;
+			SceneManager.LoadScene(nextScene, LoadSceneMode.Single);
 			
 		}
 	}
