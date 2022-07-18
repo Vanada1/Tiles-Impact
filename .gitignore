@@ -54,6 +54,7 @@ Latest commit 18aa6d8 on May 19, 2020
 
 # Visual Studio cache directory
 .vs/
+bin/
 
 # Gradle cache directory
 .gradle/
