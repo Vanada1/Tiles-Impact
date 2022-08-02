@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -44,6 +45,11 @@ public class MainScript : MonoBehaviour
 	/// </summary>
 	public Tilemap StartFinishTileMap;
 
+	/// <summary>
+	/// Menu controls.
+	/// </summary>
+	public GameObject MenuObject;
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -60,6 +66,7 @@ public class MainScript : MonoBehaviour
 	void Update()
 	{
 		CheckFinish();
+		CheckPause();
 	}
 
 	/// <summary>
@@ -123,5 +130,36 @@ public class MainScript : MonoBehaviour
 			SceneManager.LoadScene(nextScene, LoadSceneMode.Single);
 			
 		}
+	}
+
+	/// <summary>
+	/// Check pressed pause button.
+	/// </summary>
+	private void CheckPause()
+	{
+		if (!Input.GetKeyDown(KeyCode.Escape))
+		{
+			return;
+		}
+
+		if (Time.timeScale != 0)
+		{
+			Time.timeScale = 0;
+			ChangeActiveMenu(true);
+		}
+		else
+		{
+			Time.timeScale = 1;
+			ChangeActiveMenu(false);
+		}
+	}
+
+	/// <summary>
+	/// Open and close menu.
+	/// </summary>
+	/// <param name="isActive">True if need to open, else close.</param>
+	private void ChangeActiveMenu(bool isActive)
+	{
+		MenuObject.SetActive(isActive);
 	}
 }
