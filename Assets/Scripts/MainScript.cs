@@ -58,6 +58,7 @@ public class MainScript : MonoBehaviour
 		var deathScript = Player.gameObject.GetComponent<DeathScript>();
 		deathScript.CharacterKilled.AddListener(OnCharacterKilled);
 		CurrentTurn = 0;
+		ChangeActiveMenu(false);
 		LoadScenes();
 		FindStart();
 	}
@@ -142,16 +143,8 @@ public class MainScript : MonoBehaviour
 			return;
 		}
 
-		if (Time.timeScale != 0)
-		{
-			Time.timeScale = 0;
-			ChangeActiveMenu(true);
-		}
-		else
-		{
-			Time.timeScale = 1;
-			ChangeActiveMenu(false);
-		}
+		var isActiveMenu = Time.timeScale != 0;
+		ChangeActiveMenu(isActiveMenu);
 	}
 
 	/// <summary>
@@ -160,6 +153,7 @@ public class MainScript : MonoBehaviour
 	/// <param name="isActive">True if need to open, else close.</param>
 	private void ChangeActiveMenu(bool isActive)
 	{
+		Time.timeScale = isActive ? 0 : 1;
 		MenuObject.SetActive(isActive);
 	}
 }

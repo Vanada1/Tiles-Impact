@@ -6,22 +6,11 @@ public class InGameMenuScript : MonoBehaviour
 {
 	private const string MainMenuName = "Menu";
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    /// <summary>
-    /// Restart current level.
-    /// </summary>
-    public void RestartLevel()
+	/// <summary>
+	/// Restart current level.
+	/// </summary>
+	[System.Obsolete]
+	public void RestartLevel()
     {
 	    Application.LoadLevel(Application.loadedLevel);
     }
@@ -29,6 +18,7 @@ public class InGameMenuScript : MonoBehaviour
     /// <summary>
     /// Load main menu.
     /// </summary>
+    [System.Obsolete]
     public void LoadMainMenu()
     {
 	    Application.LoadLevel(MainMenuName);
