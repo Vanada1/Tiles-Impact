@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts.Core;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
@@ -8,7 +9,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 using static UnityEngine.Application;
 
-public class MainScript : MonoBehaviour
+// TODO: Refactoring this class
+public class MainScript : MonoBehaviour, IPauseable
 {
 	/// <summary>
 	/// Loader scenes.
@@ -155,5 +157,11 @@ public class MainScript : MonoBehaviour
 	{
 		Time.timeScale = isActive ? 0 : 1;
 		MenuObject.SetActive(isActive);
+	}
+	
+	/// <inheritdoc/>
+	public void SetPause(bool doSet)
+	{
+		ChangeActiveMenu(doSet);
 	}
 }
